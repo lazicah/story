@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:story/story.dart';
 import 'package:story/story_image.dart';
 import 'package:story/story_page_view.dart';
+import 'package:story/story_video.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +17,10 @@ class UserModel {
 }
 
 class StoryModel {
-  StoryModel(this.imageUrl);
+  StoryModel(this.url, this.isVideo);
 
-  final String imageUrl;
+  final String url;
+  final bool isVideo;
 }
 
 class MyApp extends StatelessWidget {
@@ -71,27 +74,35 @@ class MyHomePage extends StatelessWidget {
 final sampleUsers = [
   UserModel([
     StoryModel(
-        "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixid=MXwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxN3x8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609418426663-8b5c127691f9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyNXx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
     StoryModel(
-        "https://images.unsplash.com/photo-1609418426663-8b5c127691f9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyNXx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609444074870-2860a9a613e3?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
     StoryModel(
-        "https://images.unsplash.com/photo-1609444074870-2860a9a613e3?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        true),
     StoryModel(
-        "https://images.unsplash.com/photo-1609504373567-acda19c93dc4?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1MHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609504373567-acda19c93dc4?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1MHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
   ], "User1",
       "https://images.unsplash.com/photo-1609262772830-0decc49ec18c?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMDF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
   UserModel([
     StoryModel(
-        "https://images.unsplash.com/photo-1609439547168-c973842210e1?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609439547168-c973842210e1?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
   ], "User2",
       "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?ixid=MXwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwzMjN8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
   UserModel([
     StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
     StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
     StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
+        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        false),
   ], "User3",
       "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
 ];
@@ -131,15 +142,22 @@ class _StoryPageState extends State<StoryPage> {
               Positioned.fill(
                 child: Container(color: Colors.black),
               ),
-              Positioned.fill(
-                child: StoryImage(
-                  key: ValueKey(story.imageUrl),
-                  imageProvider: NetworkImage(
-                    story.imageUrl,
+              if (story.isVideo)
+                Positioned.fill(
+                  child: StoryVideo.network(
+                    path: story.url,
                   ),
-                  fit: BoxFit.fitWidth,
+                )
+              else
+                Positioned.fill(
+                  child: StoryImage(
+                    key: ValueKey(story.url),
+                    imageProvider: NetworkImage(
+                      story.url,
+                    ),
+                    fit: BoxFit.fitWidth,
+                  ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.only(top: 44, left: 8),
                 child: Row(
@@ -188,33 +206,33 @@ class _StoryPageState extends State<StoryPage> {
                 ),
               ),
             ),
-            if (pageIndex == 0)
-              Center(
-                child: ElevatedButton(
-                  child: const Text('show modal bottom sheet'),
-                  onPressed: () async {
-                    indicatorAnimationController.value =
-                        IndicatorAnimationCommand.pause;
-                    await showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SizedBox(
-                        height: MediaQuery.of(context).size.height / 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'Look! The indicator is now paused\n\n'
-                            'It will be coutinued after closing the modal bottom sheet.',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    );
-                    indicatorAnimationController.value =
-                        IndicatorAnimationCommand.resume;
-                  },
-                ),
-              ),
+            // if (pageIndex == 0)
+            //   Center(
+            //     child: ElevatedButton(
+            //       child: const Text('show modal bottom sheet'),
+            //       onPressed: () async {
+            //         indicatorAnimationController.value =
+            //             IndicatorAnimationCommand.pause;
+            //         await showModalBottomSheet(
+            //           context: context,
+            //           builder: (context) => SizedBox(
+            //             height: MediaQuery.of(context).size.height / 2,
+            //             child: Padding(
+            //               padding: const EdgeInsets.all(24),
+            //               child: Text(
+            //                 'Look! The indicator is now paused\n\n'
+            //                 'It will be coutinued after closing the modal bottom sheet.',
+            //                 style: Theme.of(context).textTheme.headlineSmall,
+            //                 textAlign: TextAlign.center,
+            //               ),
+            //             ),
+            //           ),
+            //         );
+            //         indicatorAnimationController.value =
+            //             IndicatorAnimationCommand.resume;
+            //       },
+            //     ),
+            //   ),
           ]);
         },
         indicatorAnimationController: indicatorAnimationController,

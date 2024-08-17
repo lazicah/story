@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:story/story_image.dart';
+import 'package:story/story_video.dart';
 
 typedef _StoryItemBuilder = Widget Function(
   BuildContext context,
@@ -301,6 +302,7 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
 
   late VoidCallback indicatorListener;
   late VoidCallback imageLoadingListener;
+  late VoidCallback videoLoadingListener;
 
   @override
   void initState() {
@@ -316,6 +318,10 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
           default:
             if (storyImageLoadingController.value ==
                 StoryImageLoadingState.loading) {
+              return;
+            }
+            if (storyVideoLoadingController.loadingState ==
+                StoryVideoLoadingState.loading) {
               return;
             }
             animationController.forward();
@@ -339,6 +345,24 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
         }
       }
     };
+
+    videoLoadingListener = () {
+      if (widget.isCurrentPage) {
+        switch (storyVideoLoadingController.loadingState) {
+          case StoryVideoLoadingState.loading:
+            animationController.stop();
+            break;
+          case StoryVideoLoadingState.available:
+            if (widget.indicatorAnimationController?.value ==
+                IndicatorAnimationCommand.pause) {
+              return;
+            }
+            animationController.duration = storyVideoLoadingController.duration;
+            animationController.forward();
+            break;
+        }
+      }
+    };
     animationController = AnimationController(
       vsync: this,
       duration: widget.indicatorDuration,
@@ -346,18 +370,23 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
         (status) {
           if (status == AnimationStatus.completed) {
             context.read<_StoryStackController>().increment(
-                restartAnimation: () => animationController.forward(from: 0));
+                restartAnimation: () {
+              animationController.duration = widget.indicatorDuration;
+              animationController.forward(from: 0);
+            });
           }
         },
       );
     widget.indicatorAnimationController?.addListener(indicatorListener);
     storyImageLoadingController.addListener(imageLoadingListener);
+    storyVideoLoadingController.addListener(videoLoadingListener);
   }
 
   @override
   void dispose() {
     widget.indicatorAnimationController?.removeListener(indicatorListener);
     storyImageLoadingController.removeListener(imageLoadingListener);
+    storyVideoLoadingController.removeListener(videoLoadingListener);
 
     super.dispose();
   }
@@ -365,6 +394,7 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Stack(
       fit: StackFit.loose,
       alignment: Alignment.topLeft,
@@ -454,6 +484,11 @@ class _Gestures extends StatelessWidget {
                     StoryImageLoadingState.loading) {
                   animationController!.forward();
                 }
+
+                if (storyVideoLoadingController.loadingState !=
+                    StoryVideoLoadingState.loading) {
+                  animationController!.forward();
+                }
               },
               onLongPress: () {
                 animationController!.stop();
@@ -461,6 +496,10 @@ class _Gestures extends StatelessWidget {
               onLongPressUp: () {
                 if (storyImageLoadingController.value !=
                     StoryImageLoadingState.loading) {
+                  animationController!.forward();
+                }
+                if (storyVideoLoadingController.loadingState !=
+                    StoryVideoLoadingState.loading) {
                   animationController!.forward();
                 }
               },
@@ -486,6 +525,11 @@ class _Gestures extends StatelessWidget {
                     StoryImageLoadingState.loading) {
                   animationController!.forward();
                 }
+
+                if (storyVideoLoadingController.loadingState !=
+                    StoryVideoLoadingState.loading) {
+                  animationController!.forward();
+                }
               },
               onLongPress: () {
                 animationController!.stop();
@@ -493,6 +537,11 @@ class _Gestures extends StatelessWidget {
               onLongPressUp: () {
                 if (storyImageLoadingController.value !=
                     StoryImageLoadingState.loading) {
+                  animationController!.forward();
+                }
+
+                if (storyVideoLoadingController.loadingState !=
+                    StoryVideoLoadingState.loading) {
                   animationController!.forward();
                 }
               },
@@ -564,7 +613,9 @@ class _IndicatorsState extends State<_Indicators> {
     if (widget.isCurrentPage &&
         !widget.animationController!.isAnimating &&
         !isStoryEnded &&
-        storyImageLoadingController.value != StoryImageLoadingState.loading) {
+        storyImageLoadingController.value != StoryImageLoadingState.loading &&
+        storyVideoLoadingController.loadingState !=
+            StoryVideoLoadingState.loading) {
       widget.animationController!.forward(from: 0);
     }
     return Padding(
