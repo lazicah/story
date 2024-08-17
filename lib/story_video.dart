@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:cached_video_player/cached_video_player.dart';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:flutter/material.dart';
 
 /// StoryVideoState
@@ -39,8 +39,8 @@ class StoryVideo extends StatefulWidget {
     Future<ClosedCaptionFile>? closedCaptionFile,
     VideoPlayerOptions? videoPlayerOptions,
     Map<String, String> httpHeaders = const <String, String>{},
-  })  : videoPlayerController = CachedVideoPlayerController.network(
-          path,
+  })  : videoPlayerController = CachedVideoPlayerPlusController.networkUrl(
+          Uri.parse(path),
           formatHint: formatHint,
           closedCaptionFile: closedCaptionFile,
           videoPlayerOptions: videoPlayerOptions,
@@ -53,7 +53,7 @@ class StoryVideo extends StatefulWidget {
     required this.path,
     Future<ClosedCaptionFile>? closedCaptionFile,
     VideoPlayerOptions? videoPlayerOptions,
-  })  : videoPlayerController = CachedVideoPlayerController.file(
+  })  : videoPlayerController = CachedVideoPlayerPlusController.file(
           File(path),
           closedCaptionFile: closedCaptionFile,
           videoPlayerOptions: videoPlayerOptions,
@@ -66,7 +66,7 @@ class StoryVideo extends StatefulWidget {
     String? package,
     Future<ClosedCaptionFile>? closedCaptionFile,
     VideoPlayerOptions? videoPlayerOptions,
-  })  : videoPlayerController = CachedVideoPlayerController.asset(
+  })  : videoPlayerController = CachedVideoPlayerPlusController.asset(
           path,
           package: package,
           videoPlayerOptions: videoPlayerOptions,
@@ -76,7 +76,7 @@ class StoryVideo extends StatefulWidget {
 
   final String path;
 
-  CachedVideoPlayerController videoPlayerController;
+  CachedVideoPlayerPlusController videoPlayerController;
 
   @override
   State<StoryVideo> createState() => _StoryVideoState();
@@ -110,7 +110,7 @@ class _StoryVideoState extends State<StoryVideo> {
       return Center(
         child: AspectRatio(
           aspectRatio: widget.videoPlayerController.value.aspectRatio,
-          child: CachedVideoPlayer(
+          child: CachedVideoPlayerPlus(
             widget.videoPlayerController,
             key: ValueKey(widget.path),
           ),
