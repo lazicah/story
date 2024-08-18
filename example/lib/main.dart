@@ -17,9 +17,10 @@ class UserModel {
 }
 
 class StoryModel {
-  StoryModel(this.url, this.isVideo);
+  StoryModel(this.url, this.isVideo, [this.text]);
 
   final String url;
+  final String? text;
   final bool isVideo;
 }
 
@@ -80,11 +81,22 @@ final sampleUsers = [
         "https://images.unsplash.com/photo-1609444074870-2860a9a613e3?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
         false),
     StoryModel(
-        "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
         true),
     StoryModel(
-        "https://images.unsplash.com/photo-1609504373567-acda19c93dc4?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1MHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-        false),
+      "https://images.unsplash.com/photo-1609504373567-acda19c93dc4?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1MHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      false,
+    ),
+    StoryModel(
+      "",
+      false,
+      'Hello text1',
+    ),
+    StoryModel(
+      "",
+      false,
+      'Hello text2',
+    ),
   ], "User1",
       "https://images.unsplash.com/photo-1609262772830-0decc49ec18c?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMDF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
   UserModel([
@@ -146,6 +158,19 @@ class _StoryPageState extends State<StoryPage> {
                 Positioned.fill(
                   child: StoryVideo.network(
                     path: story.url,
+                  ),
+                )
+              else if (story.text != null)
+                Positioned.fill(
+                  child: Container(
+                    padding: EdgeInsets.all(24),
+                    child: Center(
+                      child: Text(
+                        story.text!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
                 )
               else

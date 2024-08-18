@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:flutter/material.dart';
 
@@ -79,40 +78,44 @@ class StoryVideo extends StatefulWidget {
   CachedVideoPlayerPlusController videoPlayerController;
 
   @override
-  State<StoryVideo> createState() => _StoryVideoState();
+  State<StoryVideo> createState() => _StoryVideoState(videoPlayerController);
 }
 
 class _StoryVideoState extends State<StoryVideo> {
+  final CachedVideoPlayerPlusController _cachedVideoPlayerPlusController;
+
+  _StoryVideoState(this._cachedVideoPlayerPlusController);
+
   @override
   void initState() {
     super.initState();
     storyVideoLoadingController.loadingState = StoryVideoLoadingState.loading;
 
-    widget.videoPlayerController.initialize().then((_) {
+    _cachedVideoPlayerPlusController.initialize().then((_) {
       setState(() {});
       storyVideoLoadingController.duration =
-          widget.videoPlayerController.value.duration;
+          _cachedVideoPlayerPlusController.value.duration;
       storyVideoLoadingController.loadingState =
           StoryVideoLoadingState.available;
-      widget.videoPlayerController.play();
+      _cachedVideoPlayerPlusController.play();
     });
   }
 
   @override
   void dispose() {
-    widget.videoPlayerController.dispose();
+    _cachedVideoPlayerPlusController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.videoPlayerController.value.isInitialized) {
+    if (_cachedVideoPlayerPlusController.value.isInitialized) {
       return Center(
         child: AspectRatio(
-          aspectRatio: widget.videoPlayerController.value.aspectRatio,
+          aspectRatio: _cachedVideoPlayerPlusController.value.aspectRatio,
           child: CachedVideoPlayerPlus(
-            widget.videoPlayerController,
-            key: ValueKey(widget.path),
+            _cachedVideoPlayerPlusController,
+            key: widget.key,
           ),
         ),
       );
