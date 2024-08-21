@@ -17,6 +17,8 @@ typedef _StoryConfigFunction = int Function(int pageIndex);
 
 enum IndicatorAnimationCommand { pause, resume }
 
+enum ItemType { other, image, video }
+
 /// PageView to implement story like UI
 ///
 /// [itemBuilder], [storyLength], [pageLength] are required.
@@ -304,6 +306,7 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
   late VoidCallback indicatorListener;
   late VoidCallback imageLoadingListener;
   late VoidCallback videoLoadingListener;
+  ItemType _itemType = ItemType.other;
 
   @override
   void initState() {
@@ -335,6 +338,10 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
         switch (storyImageLoadingController.value) {
           case StoryImageLoadingState.loading:
             animationController.stop();
+            if (mounted)
+              setState(() {
+                _itemType = ItemType.image;
+              });
             break;
           case StoryImageLoadingState.available:
             if (widget.indicatorAnimationController?.value ==
@@ -342,6 +349,10 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
               return;
             }
             animationController.forward();
+            if (mounted)
+              setState(() {
+                _itemType = ItemType.image;
+              });
             break;
         }
       }
@@ -352,7 +363,12 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
         switch (storyVideoLoadingController.loadingState) {
           case StoryVideoLoadingState.loading:
             animationController.stop();
+            if (mounted)
+              setState(() {
+                _itemType = ItemType.video;
+              });
             break;
+          case StoryVideoLoadingState.playing:
           case StoryVideoLoadingState.available:
             if (widget.indicatorAnimationController?.value ==
                 IndicatorAnimationCommand.pause) {
@@ -360,6 +376,13 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
             }
             animationController.duration = storyVideoLoadingController.duration;
             animationController.forward();
+
+            if (mounted)
+              setState(() {
+                _itemType = ItemType.video;
+              });
+            break;
+          case StoryVideoLoadingState.paused:
             break;
         }
       }
@@ -441,6 +464,12 @@ class _StoryPageBuilderState extends State<_StoryPageBuilder>
         _Gestures(
           indicatorDuration: widget.indicatorDuration,
           animationController: animationController,
+          itemType: _itemType,
+          onChangeItemType: (ItemType value) {
+            setState(() {
+              _itemType = value;
+            });
+          },
         ),
         Positioned.fill(
           child: widget.gestureItemBuilder?.call(
@@ -463,10 +492,14 @@ class _Gestures extends StatelessWidget {
     Key? key,
     required this.animationController,
     required this.indicatorDuration,
+    required this.itemType,
+    required this.onChangeItemType,
   }) : super(key: key);
 
   final AnimationController? animationController;
   final Duration indicatorDuration;
+  final ItemType itemType;
+  final ValueChanged<ItemType> onChangeItemType;
 
   @override
   Widget build(BuildContext context) {
@@ -480,31 +513,50 @@ class _Gestures extends StatelessWidget {
                 animationController!.duration = indicatorDuration;
                 animationController!.forward(from: 0);
                 context.read<_StoryStackController>().decrement();
+                onChangeItemType.call(ItemType.other);
               },
               onTapDown: (_) {
                 animationController!.stop();
               },
               onTapUp: (_) {
                 if (storyImageLoadingController.value !=
-                    StoryImageLoadingState.loading) {
+                        StoryImageLoadingState.loading &&
+                    itemType == ItemType.image) {
                   animationController!.forward();
                 }
-
                 if (storyVideoLoadingController.loadingState !=
-                    StoryVideoLoadingState.loading) {
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  animationController!.forward();
+                }
+                if (itemType == ItemType.other) {
                   animationController!.forward();
                 }
               },
               onLongPress: () {
+                if (storyVideoLoadingController.loadingState !=
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  storyVideoLoadingController.loadingState =
+                      StoryVideoLoadingState.paused;
+                }
                 animationController!.stop();
               },
               onLongPressUp: () {
                 if (storyImageLoadingController.value !=
-                    StoryImageLoadingState.loading) {
+                        StoryImageLoadingState.loading &&
+                    itemType == ItemType.image) {
                   animationController!.forward();
                 }
                 if (storyVideoLoadingController.loadingState !=
-                    StoryVideoLoadingState.loading) {
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  animationController!.forward();
+                  storyVideoLoadingController.loadingState =
+                      StoryVideoLoadingState.playing;
+                }
+
+                if (itemType == ItemType.other) {
                   animationController!.forward();
                 }
               },
@@ -523,32 +575,50 @@ class _Gestures extends StatelessWidget {
                       },
                       completeAnimation: () => animationController!.value = 1,
                     );
+                onChangeItemType.call(ItemType.other);
               },
               onTapDown: (_) {
                 animationController!.stop();
               },
               onTapUp: (_) {
                 if (storyImageLoadingController.value !=
-                    StoryImageLoadingState.loading) {
+                        StoryImageLoadingState.loading &&
+                    itemType == ItemType.image) {
                   animationController!.forward();
                 }
-
                 if (storyVideoLoadingController.loadingState !=
-                    StoryVideoLoadingState.loading) {
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  animationController!.forward();
+                }
+                if (itemType == ItemType.other) {
                   animationController!.forward();
                 }
               },
               onLongPress: () {
+                if (storyVideoLoadingController.loadingState !=
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  storyVideoLoadingController.loadingState =
+                      StoryVideoLoadingState.paused;
+                }
                 animationController!.stop();
               },
               onLongPressUp: () {
                 if (storyImageLoadingController.value !=
-                    StoryImageLoadingState.loading) {
+                        StoryImageLoadingState.loading &&
+                    itemType == ItemType.image) {
                   animationController!.forward();
                 }
-
                 if (storyVideoLoadingController.loadingState !=
-                    StoryVideoLoadingState.loading) {
+                        StoryVideoLoadingState.loading &&
+                    itemType == ItemType.video) {
+                  animationController!.forward();
+                  storyVideoLoadingController.loadingState =
+                      StoryVideoLoadingState.playing;
+                }
+
+                if (itemType == ItemType.other) {
                   animationController!.forward();
                 }
               },

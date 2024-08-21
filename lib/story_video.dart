@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 /// StoryVideoState
 enum StoryVideoLoadingState {
   loading,
-  available;
+  available,
+  paused,
+  playing,
 }
 
 class StoryVideoLoadingController extends ChangeNotifier {
@@ -86,6 +88,8 @@ class _StoryVideoState extends State<StoryVideo> {
 
   _StoryVideoState(this._cachedVideoPlayerPlusController);
 
+  late VoidCallback videoListener;
+
   @override
   void initState() {
     super.initState();
@@ -99,11 +103,27 @@ class _StoryVideoState extends State<StoryVideo> {
           StoryVideoLoadingState.available;
       _cachedVideoPlayerPlusController.play();
     });
+    videoListener = () {
+      switch (storyVideoLoadingController.loadingState) {
+        case StoryVideoLoadingState.loading:
+          break;
+        case StoryVideoLoadingState.playing:
+          _cachedVideoPlayerPlusController.play();
+          break;
+        case StoryVideoLoadingState.available:
+          break;
+        case StoryVideoLoadingState.paused:
+          _cachedVideoPlayerPlusController.pause();
+          break;
+      }
+    };
+    storyVideoLoadingController.addListener(videoListener);
   }
 
   @override
   void dispose() {
     _cachedVideoPlayerPlusController.dispose();
+    storyVideoLoadingController.removeListener(videoListener);
     super.dispose();
   }
 
